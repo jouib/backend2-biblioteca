@@ -158,6 +158,7 @@ export class Emprestimo{
                 FROM Emprestimo e
                 JOIN Aluno a ON e.id_aluno = a.id_aluno
                 JOIN Livro l ON e.id_livro = l.id_livro;
+                WHERE e.status_emprestimo_registro = TRUE;
             `;
     
             // Executa a query no banco de dados
@@ -300,6 +301,40 @@ export class Emprestimo{
             console.error(`Erro ao atualizar empréstimo: ${error}`);
             // lança um novo erro
             throw new Error('Erro ao atualizar o empréstimo.');
+        }
+    }
+
+    static async removerEmprestimo(idEmprestimo: number): Promise<boolean> {
+        // variável de controle da query
+        let queryResult = false;
+
+        // tenta executar a query
+        try {
+            // monta a query
+            const queryDeleteEmprestimo = `UPDATE emprestimo 
+                                            SET status_emprestimo_registro = FALSE
+                                            WHERE id_emprestimo=${idEmprestimo}`;
+
+            // executa a query e armazena a resposta
+            const respostaBD = await database.query(queryDeleteEmprestimo);
+
+            // verifica se a quantidade de linhas retornadas é diferente de 0
+            if(respostaBD.rowCount != 0) {
+                // exibe mensagem de sucesso
+                console.log('Empréstimo removido com sucesso!');
+                // altera o valor da variável para true
+                queryResult = true;
+            }
+
+            // retorna a resposta
+            return queryResult;
+
+        // captura qualquer erro que possa acontecer
+        } catch (error) {
+            // exibe detalhes do erro no console
+            console.log(`Erro ao remover empréstimo: ${error}`);
+            // retorna a resposta
+            return queryResult;
         }
     }
 }
