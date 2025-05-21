@@ -2,6 +2,7 @@ import { Livro } from "../model/Livro";
 import { Request, Response} from "express";
 import fs from 'fs';
 import path from 'path';
+import { gerarNomeAleatorio } from '../utils/NomeAleatorio';
 
 /**
  * Interface LivroDTO
@@ -74,21 +75,22 @@ class LivroController extends Livro {
                 // Inserindo capa do livro, se informada
                 if (req.file) {
                     const ext = path.extname(req.file.originalname);
-                    const sanitize = (texto: string) => texto
-                        .replace(/[^a-zA-Z0-9-_ ]/g, '') // remove caracteres especiais (exceto espaço, hífen e underscore)
-                        .replace(/ /g, "_");             // troca espaços por underscores
-
-                    const tituloSanitizado = sanitize(novoLivro.getTitulo());
-                    const editoraSanitizada = sanitize(novoLivro.getEditora());
-
-                    const novoNome = `${tituloSanitizado}_${editoraSanitizada}${ext}`;
-                    const antigoPath = req.file.path;
-                    const novoPath = path.resolve(req.file.destination, novoNome);
-
-                    fs.renameSync(antigoPath, novoPath);
-
-                    await Livro.atualizarImagemCapa(novoNome, novoLivro.getIdLivro());
+                    const nomeArquivo = gerarNomeAleatorio(16) + ext;
+                
+                    const caminhoDestino = path.join(__dirname, '..', 'uploads', nomeArquivo);
+                
+                    fs.rename(req.file.path, caminhoDestino, (err) => {
+                        if (err) {
+                            console.error('Erro ao salvar a imagem:', err);
+                        } else {
+                            console.log('Imagem salva como:', nomeArquivo);
+                        }
+                    });
+                
+                    // Se quiser, adicione a propriedade capa no objeto Livro:
+                    // novoLivro.setCapaImagem(nomeArquivo);
                 }
+                
 
                 // Retorno de sucesso com o ID do livro
                 return res.status(200).json({mensagem: 'Livro cadastrado com sucesso'});
