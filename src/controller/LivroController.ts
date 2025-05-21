@@ -102,6 +102,7 @@ class LivroController extends Livro {
             });
         }
     }
+
      /**
      * Remove um aluno.
      * @param req Objeto de requisição HTTP com o ID do aluno a ser removido.
@@ -168,5 +169,3 @@ class LivroController extends Livro {
 }
 
 export default LivroController;
-
-

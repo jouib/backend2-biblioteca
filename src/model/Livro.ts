@@ -322,17 +322,18 @@ export class Livro {
             const queryInsertLivro = `
                 INSERT INTO Livro (titulo, autor, editora, ano_publicacao, isbn, quant_total, quant_disponivel, valor_aquisicao, status_livro_emprestado)
                 VALUES (
-                    '${livro.getTitulo().toUpperCase()}',
-                    '${livro.getAutor().toUpperCase()}',
-                    '${livro.getEditora().toUpperCase()}',
-                    '${livro.getAnoPublicacao().toUpperCase()}',
-                    '${livro.getISBN().toUpperCase()}',
-                    '${livro.getQuantTotal()}',
-                    '${livro.getQuantDisponivel()}',
-                    '${livro.getValorAquisicao()}',
-                    '${livro.getStatusLivroEmprestado().toUpperCase()}'
+                '${(livro.getTitulo() || '').toUpperCase()}',
+                '${(livro.getAutor() || '').toUpperCase()}',
+                '${(livro.getEditora() || '').toUpperCase()}',
+                '${livro.getAnoPublicacao() || ''}',
+                '${(livro.getISBN() || '').toUpperCase()}',
+                '${livro.getQuantTotal() || 0}',
+                '${livro.getQuantDisponivel() || 0}',
+                '${livro.getValorAquisicao() || 0}',
+                '${(livro.getStatusLivroEmprestado() || '').toUpperCase()}'
                 )
                 RETURNING id_livro;`;
+
 
             // executa a consulta no banco e armazena o resultado
             const result = await database.query(queryInsertLivro);
